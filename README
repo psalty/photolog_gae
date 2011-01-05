@@ -1,0 +1,14 @@
+This file is a READEME file about photolog_gae project.
+
+
+This is a project developed based on Google App Engine service.
+sfphotolog.appspot.com is a live demo page.
+
+This project includes
+
+1. Python Google App Engine 
+2. PyAMF integration
+3. Facebook connect integration
+4. Flickr API integration
+5. Picasa API integration based of Google Feed API
+6. External API to support iOS(iPhone APP) support
