@@ -1,0 +1,46 @@
+<div style="display:block;padding-top:10px;width:300px;">
+	{% ifequal node.class_name "ImageContent" %}
+	<div>
+		<img src='instax?instax_id={{ node.img_src.key }}'/>
+		<input id='gkey' type='hidden' value='{{ node.key }}'/>
+	</div>
+	<div style="padding-top:10px;"></div>
+	<div id="editInPlaceTitle" style="font-size:12pt;"></div>
+	<div style="padding-top:10px;"></div>
+	<div id="editInPlaceTextBox" style="font-size:10pt;"></div>
+	<div style="padding-top:10px;"></div>
+	<div id="editInPlaceTag" style="padding-top:10px;" style="font-size:10pt;"></div>
+	{% endifequal %}
+	{% ifequal node.class_name "FlickrContent" %}
+	<div>
+		<img src="http://static.flickr.com/{{node.server}}/{{node.photo_id}}_{{node.secret}}_m.jpg"/>
+		<input id='gkey' type='hidden' value='{{node.key}}'/>
+	</div>
+	<div style="padding-top:10px;"></div>
+	<div style="font-size:12pt;">{{ node.title }}</div>
+	<div style="padding-top:10px;"></div>
+	<div id="editInPlaceTextBox" style="font-size:10pt;"></div>
+	<div style="padding-top:10px;"></div>
+	<div style="display:block;padding-top:10px;style="font-size:8pt;">
+	{% for keyword in node.tags %}
+		<span>{{keyword}}</span>
+	{% endfor %}
+	</div>
+	{% endifequal %}
+	{% ifequal node.class_name "PicasaContent" %}
+	<div>
+		<img src="{{node.thumb_medium}}"/>
+		<input id='gkey' type='hidden' value='{{node.key}}'/>
+	</div>
+	<div style="padding-top:10px;"></div>
+	<div style="font-size:12pt;">{{ node.title }}</div>
+	<div style="padding-top:10px;"></div>
+	<div id="editInPlaceTextBox" style="font-size:10pt;"></div>
+	<div style="padding-top:10px;"></div>
+	<div style="display:block;padding-top:10px;style="font-size:8pt;">
+	{% for keyword in node.tags %}
+		<span>{{keyword}}</span>
+	{% endfor %}
+	</div>
+	{% endifequal %}
+</div>

@@ -1,0 +1,133 @@
+	body {
+	font-family:"Helvetica","Verdana","Trebuchet MS" ,"Arial","sans-serif";
+	text-align:center;
+	background: #000000;
+	}
+
+	.root_div
+	{
+		width: 800px;
+		margin-top:10px;
+		margin-bottom: auto;
+		margin-left: auto;
+		margin-right: auto;
+		text-align:left;
+	}
+
+	.root_div_tile
+	{
+		width: 800px;
+		margin-top:10px;
+		margin-bottom: auto;
+		margin-left: auto;
+		margin-right: auto;
+		text-align:left;
+	}
+	div.user_info{
+		display:block;
+		padding: 5px;
+		color:#eee;
+	}
+
+	a.tag_cloud {text-decoration : none}
+	a:link {color : #8b8989}
+	a:visited {color : #8b8989}
+	
+	.thumb_tile{
+		float: left;
+		padding-top:20px;
+	}
+	
+	.tag_div_stream {
+		display:block;
+		width: 150px;
+		height: 500px;
+		color:#eee;
+		padding-top:10px;
+	}
+	
+
+	.tag_div_tile {
+		display:block;
+		overflow:hidden;
+		color:#eee;
+		padding-top:10px;
+	}
+	
+	.tag_fix{
+		position: fixed;  
+		top: 40px; 
+		left:300px;
+		z-index:999;
+	
+	}
+	
+	.tile_block{
+		display:inline;
+		float:left;
+		padding: 5px;
+	}
+	
+	.gallery
+	{
+		width: 500px;
+		position:relative;
+		display:block;
+		margin: auto;
+	}
+	
+	img.primary_photo_img 
+	{
+		max-width: 500px;
+	}
+	
+	.primary_content_div
+	{
+		display:block;
+		text-align:center;
+		margin-top: 100px;
+	}
+
+	.polaroid_frame a:after {
+		content: attr(title);
+	}
+
+	.polaroid_frame img { 
+		display: block; 
+		width: 120px; 
+		margin-bottom: 12px; 
+	}
+	._polaroid_frame img { 
+		display: block; 
+		width: 120px; 
+		margin-bottom: 12px; 
+	}
+	
+	.polaroid_frame{
+		font-size:10pt;
+		color:#000;
+		text-decoration:nones
+	}
+
+	.polaroid_frame a{
+		background: #fff;
+		border: 1px solid #fff;
+		-webkit-transition: -webkit-transform .15s linear;
+		-moz-box-shadow: 0 3px 6px rgba(0,0,0,.25);
+		-webkit-box-shadow: 0 3px 6px rgba(0,0,0,.25);
+		display: inline; 
+		float: left; 
+		width: auto; 
+		padding: 8px 8px 13px; 
+		text-align: center;
+	}
+	
+	.polaroid_frame a:hover {
+		 -webkit-transform: scale(1.25);
+		-moz-transform: scale(1.25);
+		position: relative;
+		z-index: 5;
+	 }
+	.pd_btw{
+	 	padding-top:150px;
+	}

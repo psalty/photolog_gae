@@ -1,0 +1,60 @@
+application: your_app_name_heres
+
+version: 7
+runtime: python
+api_version: 1
+
+handlers:
+- url: /swfs
+  static_dir: swfs
+  
+- url: /info
+  static_dir: info
+
+- url: /js
+  static_dir: js
+
+- url: /js/protovis
+  static_dir: js/protovis
+  
+- url: /js/external
+  static_dir: js/external
+
+- url: /css
+  static_dir: css
+
+- url: /img
+  static_dir: img
+
+- url: /Media
+  static_dir: Media
+
+- url: /profile/.*
+  script: user_profile.py
+  login: required
+
+- url: /admin/.*
+  script: admin.py
+  login: admin
+
+- url: /favicon.ico
+  static_files: img/favicon.ico
+  upload: img/favicon.ico
+
+- url: /.*
+  script: main.py
+
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?.*\.bak$
+- ^(.*/)?.*js/dev/.*
+- ^(.*/)?.*dev/.*
+- ^(.*/)?.*python-sdk/.*

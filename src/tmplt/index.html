@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
+	<head>
+	<meta charset="UTF-8" />
+	<title> Welcome to SF Photoclub </title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type='text/javascript' src='js/jquery.corner.js'></script>
+	<script type="text/javascript" src="js/jquery.tipsy.js"></script>	
+	<script src="http://connect.facebook.net/en_US/all.js"></script>
+	<link type='text/css' href='css/index_view.css' rel='stylesheet'/>
+	<link type='text/css' href='css/tipsy.css' rel='stylesheet' />
+	<link type='text/css' href='css/mbutton.css' rel='stylesheet'/>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('div.text_block').corner();
+			$('.gallery').tipsy({gravity : 'w', html : true , title : function(){ return $(this).find('div').html() ;}});
+			// auto content fetch when screen is scrolling
+			$(window).scroll(function(){
+				if ($(window).scrollTop() == $(document).height() - $(window).height()){
+						
+						$.get('/mmore', 
+							{},
+							function(data) {
+								//alert(data);
+								$(data).find(".gallery").each(function(index)
+								{
+									var div_pad = $(document.createElement('div')).addClass('pd_btw');
+									$('.pd_btw').last().after(this);
+									
+									$(this).after(div_pad);
+									$(this).tipsy({gravity : 'w', html : true , title : function(){ return $(this).find('div').html() ;}});
+								
+								});
+							});
+				}
+			}); 
+		});
+	</script>
+
+	</head>
+<body>
+<div class="root_div">
+	<div>
+		<div style="border:0;position: fixed;  top: 10px;z-index:999;">
+			<div style="color:#fff;font-size:20pt;">
+				SF Photoclub
+			</div>
+			<a class='minibutton' href='/'><span >All</span></a>
+			<a class='minibutton' href='/?mode=tile'><span>Tile</span></a>
+			<a class='minibutton' href='info/faq.html'><span >?</span></a>
+			<a class='minibutton' href='http://www.pixtox.com' ><span>PixTox</span></a>
+			<a class='minibutton' href='/view?type=add.entry'><span>+</span></a>
+			<a class='minibutton' href='/view?type=profile' ><span>@</span></a>
+			<fb:login-button autologoutlink="true"></fb:login-button>
+			<div id="fb-root"></div>
+			<script>
+			FB.init({appId: '{{facebook_app_id}}', status: true, cookie: true, xfbml: true});
+			FB.Event.subscribe('auth.sessionChange', function(response) {
+				if (response.session) {
+				// A user has logged in, and a new cookie has been saved
+				} else {
+				// The user has logged out, and the cookie has been cleared
+				}
+			});
+			</script>
+			<div class="tag_div_stream">
+				{% for keyword in keywords %}
+					<span style="text-decoration:none;font-size:{{keyword.cnt|tag_weight}}pt"><a class="tag_cloud" href="/?keyword={{keyword.tag}}">{{keyword.tag}}</a></span>
+				{% endfor %}
+			</div>
+		</div>
+		<div style="border:0;position: fixed;bottom: 10px;z-index:999;">
+			<div style="color:#8b8989;font-size:8pt;">
+				<div>Design & Integration & Development by Jaehong Park</div>
+				<div>Inspired by Flickr&GAE&WEB2.0</div>
+				<div>Copyright &copy; 2010 <a href="/admin/">ShorelineRunner.</a> All rights reserved.</div>
+			</div>
+		</div>
+		<div style="clear:both;position: relative;width:800px;">
+			<div class="primary_content_div">
+				{% for obj_content in obj_contents %}
+					{% ifequal obj_content.class_name "ImageContent" %}
+					<div class="gallery">
+						<a href="/view?type=mcontent&gkey={{ obj_content.key }}"><img class="primary_photo_img" src="/img?img_id={{ obj_content.img_src.key }}" border="0" /></a>
+						<div style="display:none;">
+						{% if obj_content.title %}
+							<div style="display:block;">{{obj_content.title}}</div>
+						{% else %}
+							<div style="display:block;">Untitled</div>
+						{% endif %}
+							<div style="display:block;padding-top:10px;font-size: 8pt;"><i>{{obj_content.owner_name}}</i></div>
+						{% if obj_content.content_text %}
+							<div style="display:block;padding-top:10px;font-size: 8pt;">{{obj_content.content_text|shortenText}}</div>
+						{% endif %}
+						</div>
+					</div>
+					{% endifequal %}
+					{% ifequal obj_content.class_name "FlickrContent" %}
+					<div class="gallery">
+						<a href="/view?type=mcontent&gkey={{ obj_content.key }}"><img class="primary_photo_img" src="http://farm4.static.flickr.com/{{obj_content.server}}/{{obj_content.photo_id}}_{{obj_content.secret}}_z.jpg" border="0"/></a>
+						<div style="display:none;">
+						{% if obj_content.title %}
+							<div style="display:block;">{{obj_content.title}}</div>
+						{% else %}
+							<div style="display:block;">Untitled</div>
+						{% endif %}
+							<div style="display:block;padding-top:10px;font-size: 5pt;"><i>{{ obj_content.owner_name }}</i></div>
+						{% if obj_content.content_text %}
+							<div style="display:block;padding-top:10px;font-size: 8pt;">{{obj_content.content_text|shortenText}}</div>
+						{% endif %}
+						</div>
+					</div>
+					{% endifequal %}
+					{% ifequal obj_content.class_name "PicasaContent" %}
+					<div class="gallery">
+						<a href="/view?type=mcontent&gkey={{ obj_content.key }}"><img class="primary_photo_img" src="{{obj_content.photo_path}}" border="0"/></a>
+						<div style="display:none;">
+						{% if obj_content.title %}
+							<div style="display:block;">{{obj_content.title}}</div>
+						{% else %}
+							<div style="display:block;">Untitled</div>
+						{% endif %}
+							<div style="display:block;padding-top:10px;font-size: 5pt;"><i>{{obj_content.owner_name}}</i></div>
+						{% if obj_content.content_text %}
+							<div style="display:block;padding-top:10px;font-size: 8pt;">{{obj_content.content_text|shortenText}}</div>
+						{% endif %}
+						</div>
+					</div>
+					{% endifequal %}
+					<div class="pd_btw"></div>
+				{%endfor%}
+			</div>
+		</div>
+	</div>
+
+</div>
+
+	<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+	try {
+	var pageTracker = _gat._getTracker("{{ google_track_id }}");
+	pageTracker._trackPageview();
+	} catch(err) {}</script>
+</body>
+</html>

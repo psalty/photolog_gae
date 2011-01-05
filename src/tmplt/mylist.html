@@ -1,0 +1,27 @@
+<div class="thumb_tile">
+	{% for obj_content in obj_contents %}
+		{% ifnotequal obj_content.key pnode.key %}
+			{% ifequal obj_content.class_name "ImageContent" %}
+			<div class="tile_block">
+				<a href="javascript:previewMyContent('{{obj_content.key}}','/instax?instax_id={{ obj_content.img_src.key }}')">
+					<img src="/thumb?thumb_id={{ obj_content.key }}" width="80px" height="80px" class="pc_img" border="0" />
+				</a>
+			</div>
+			{% endifequal %}
+			{% ifequal obj_content.class_name "FlickrContent" %}
+			<div class="tile_block">
+				<a href="javascript:previewMyContent('{{obj_content.key}}','http://farm4.static.flickr.com/{{obj_content.server}}/{{obj_content.photo_id}}_{{obj_content.secret}}_m.jpg')">
+					<img src="http://farm4.static.flickr.com/{{obj_content.server}}/{{obj_content.photo_id}}_{{obj_content.secret}}_s.jpg" width="80px" height="80px" class="pc_img" border="0" />
+				</a>
+			</div>
+			{% endifequal %}
+			{% ifequal obj_content.class_name "PicasaContent" %}
+				<div class="tile_block">
+					<a href="javascript:previewMyContent('{{obj_content.key}}','{{obj_content.thumb_medium}}')">
+						<img src="{{obj_content.thumb_small}}"/>
+					</a>
+				</div>			
+			{% endifequal %}
+		{% endifnotequal %}
+	{% endfor %}
+</div>

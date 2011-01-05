@@ -1,0 +1,174 @@
+	<head>
+		<title>Plotting Relations</title>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+		<script type="text/javascript" src="js/jquery.timers.js"></script>
+		<script type="text/javascript" src="js/jquery.tipsy.js"></script>
+		<script src="http://connect.facebook.net/en_US/all.js"></script>
+		<script type="text/javascript" src="js/protovis/protovis-r3.2.js"></script>
+		<script type="text/javascript" src="js/protovis/tipsy.js"></script>
+		<link type='text/css' href='css/add_entry.css' rel='stylesheet'/>
+		<link type='text/css' href='css/view.css' rel='stylesheet'/>
+		<link type='text/css' href='css/mbutton.css' rel='stylesheet'/>
+		<link href="css/tipsy.css" type="text/css" rel="stylesheet"/>
+		
+		<style type="text/css">
+			body {
+				margin: 0;
+			}
+		</style>
+	<script type="text/javascript+protovis">
+	 $(document).ready(function() {
+		//$(document).everyTime(5000,"update",function(){getNextLevel();});
+	});
+	
+	function getNodeIndex(nar,nodeName)
+	{
+		var i = 0;
+		for(i = 0 ; i < nar.length; i++)
+		{
+			if (nar[i].nodeName ==  nodeName)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	function getNextLevel()
+	{
+		var no_of_children = leaf.length;
+		for(i = 0; i < no_of_children; i++)
+		{
+			var tmp = leaf.shift();
+			$.get('/list',{ pkey : tmp.nodeName, type : 'nlevel' },
+				function(data){
+					var obj = jQuery.parseJSON(data);
+					var old_length = cvnode.length;
+						
+					$.each(obj, function(j,item){
+						cvnode.push({ nodeName : item , group : tmp.group+5 });
+						leaf.push({ nodeName: item, index: cvnode.length -1 , group: tmp.group+5 , value: tmp.value});
+						cvlink.push({source: cvnode.length - 1, target: tmp.index , value: tmp.value});
+					});
+				force.nodes(miserables.nodes).links(miserables.links);
+				force.reset();
+				force.link.add(pv.Line);
+		
+				var dots = force.node.add(pv.Dot)
+				.size(function(d) (d.linkDegree + 15) * Math.pow(this.scale, -1.5))
+				.fillStyle(function(d) d.fix ? "brown" : colors(d.group))
+				.strokeStyle(function() this.fillStyle().darker())
+				.lineWidth(1)
+				.event("mouseover", pv.Behavior.tipsy({gravity: "sw", fade: true , html: true}))
+/*				.title(function(d) d.nodeName)*/
+				.event("mousedown", pv.Behavior.drag())
+				.event("drag", force);
+/*				.event("click", pv.Behavior.tipsy( {gravity: "sw", fade: true , html: true}) );*/
+
+				vis.render();
+			
+				});
+			}
+	
+	}
+	
+	function getContent(selected)
+	{
+		window.location = '/view?type=mcontent&gkey='+selected.nodeName;
+	}
+	</script>
+	</head>
+	<body>
+	<div class="root_div">
+		<div>
+			<a class='minibutton' href='/'><span >Home</span></a>
+			{% if current_fb_user %}
+				<a class='minibutton' href='/view?type=add.entry'><span>New</a></span>
+				<a class='minibutton' href='/view?type=mcontent' ><span>History</span></a>
+			{% endif %}
+			<fb:login-button autologoutlink="true"></fb:login-button>
+			<div id="fb-root"></div>
+			<script>
+			FB.init({appId: '{{facebook_app_id}}', status: true, cookie: true, xfbml: true});
+			FB.Event.subscribe('auth.sessionChange', function(response) {
+				if (response.session) {
+				// A user has logged in, and a new cookie has been saved
+				} else {
+				// The user has logged out, and the cookie has been cleared
+				}
+			});
+			</script>
+		</div>
+	<script type="text/javascript+protovis">
+	var vis;
+	var cvlink = [];
+	var leaf = [];
+	var i = 0;
+	
+//	var cvnode = [{nodeName:'{{thisNode.key}}', group: 0}];
+	var cvnode = [];
+
+	{% for link in links %}
+		// check source is alreay in the array
+		var sindex = getNodeIndex(cvnode,'{{link.source.anode.key}}');
+		var tindex = getNodeIndex(cvnode,'{{link.target.anode.key}}');
+		
+		if(sindex == -1)
+		{
+			cvnode.push({nodeName: '{{link.source.anode.key}}', group:0});
+			sindex = cvnode.length -1;
+		}
+		
+		if(tindex == -1)
+		{
+			cvnode.push({nodeName: '{{link.target.anode.key}}', group:0});
+			tindex = cvnode.length -1;
+		}
+
+		cvlink.push({source: sindex, target: tindex, value:1});
+	{% endfor %}
+	
+
+	var miserables = {nodes:cvnode ,links: cvlink};
+
+	total_length = cvnode.length;
+/*
+	var w = document.body.clientWidth/2,
+		h = document.body.clientHeight/2,
+*/	
+	var w = 800,
+		h = 800,
+
+	colors = pv.Colors.category19();
+
+	vis = new pv.Panel()
+	.width(w)
+	.height(h)
+	.fillStyle("white")
+	.event("mousedown", pv.Behavior.pan())
+	.event("mousewheel", pv.Behavior.zoom());
+	
+	var force = vis.add(pv.Layout.Force)
+				.nodes(miserables.nodes)
+				.links(miserables.links);
+	
+	force.link.add(pv.Line);
+
+	force.node.add(pv.Dot)
+	.size(function(d) (d.linkDegree + 15) * Math.pow(this.scale, -1.5))
+	.fillStyle(function(d) d.fix ? "brown" : colors(d.group))
+	.strokeStyle(function() this.fillStyle().darker())
+	.lineWidth(1)
+	.event("mouseover", pv.Behavior.tipsy({gravity: "sw", fade: true , html: true}))
+/*	.title(function(d) d.nodeName)*/
+	.event("mousedown", pv.Behavior.drag())
+	.event("drag", force);
+/*	.event("click", pv.Behavior.tipsy( {gravity: "sw", fade: true , html: true}) );*/
+
+	vis.render();
+
+	</script>
+
+	</div>
+	</body>
+</html>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8" />
+	<title> My History</title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type='text/javascript' src="js/jquery.editinplace.js"></script>
+	<script src="http://connect.facebook.net/en_US/all.js"></script>
+	<link type='text/css' href='css/view.css' rel='stylesheet'/>
+	<link type='text/css' href='css/mbutton.css' rel='stylesheet'/>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#editInPlaceUPF").editInPlace({
+				default_text: "(Add Your Primary Gallery RSS Feed)",
+				url: '/update',
+				params: 'target=user_upf&ukey={{current_fb_user.key}}',
+				success: function(data){;}
+			});
+		});
+
+	</script>
+</head>
+<body>
+<div class="root_div">
+	<div>
+			<div style="color:#000;font-size:20pt;">
+				SF Photoclub
+			</div>
+			<a class='minibutton' href='/'><span >Home</span></a>
+			<a class='minibutton' href='/view?type=add.entry'><span>+</a></span>
+			<fb:login-button autologoutlink="true"></fb:login-button>
+			<div id="fb-root"></div>
+			<script>
+			FB.init({appId: '{{facebook_app_id}}', status: true, cookie: true, xfbml: true});
+			FB.Event.subscribe('auth.sessionChange', function(response) {
+				if (response.session) {
+				// A user has logged in, and a new cookie has been saved
+					window.location.reload();
+				} else {
+				// The user has logged out, and the cookie has been cleared
+					window.location.reload();
+				}
+			});
+			</script>
+	</div>
+	<div style="clear:both;position: relative;padding-top:20px;width:800px;">
+		<div class="tag_div">
+			{% for keyword in keywords %}
+				<span style="text-decoration:none;font-size:{{keyword.cnt|tag_weight}}pt"><a class="tag_cloud" href="/?keyword={{keyword.tag}}">{{keyword.tag}}</a></span>
+			{% endfor %}
+			</div>
+			<div style="padding-top:20px;font-size:10pt;">
+				<div>
+				{% if requested_user %}
+					<a href="{{ requested_user.profile_url }}">
+						<img style="border:none;" src="http://graph.facebook.com/{{ requested_user.id }}/picture?type=square"/>
+					</a>
+				{% else %}
+					<a href="{{ current_fb_user.profile_url }}">
+						<img style="border:none;" src="http://graph.facebook.com/{{ current_fb_user.id }}/picture?type=square"/>
+					</a>
+				{% endif %}
+				</div>
+				{% if requested_user %}
+					{% ifequal current_fb_user.id requested_user.id %}
+						<div style="padding-top:5px;"> {{current_fb_user.name}}'s Account</div>
+						<div style="padding-top:5px;">Since {{current_fb_user.created}}</div>
+						<div style="padding-top:5px;">Last {{current_fb_user.updated}}</div>
+						<div style="padding-top:5px;">User Primary RSS feed : <div style="display:inline;" id="editInPlaceUPF">{{current_fb_user.upf}}</div></div>
+					{% else %}
+						<div style="padding-top:5px;"> Welcome to {{requested_user.name}}'s Page</div>
+					{% endifequal %}
+				{% else %}
+					{% if current_fb_user %}
+						<div style="padding-top:5px;"> {{current_fb_user.name}}'s Account</div>
+						<div style="padding-top:5px;">Since {{current_fb_user.created}}</div>
+						<div style="padding-top:5px;">Last {{current_fb_user.updated}}</div>
+						<div style="padding-top:5px;">User Primary RSS feed : <div style="display:inline;" id="editInPlaceUPF">{{current_fb_user.upf}}</div></div>
+					{% else %}
+						<div style="padding-top:5px;"> Welcome to {{current_fb_user.name}}'s Page</div>
+					{% endif %}
+				{% endif %}
+			</div>
+			<hr align='center' noshade>
+			<div class="thumb_tile">
+				{% for obj_content in facebook_contents %}
+					{% ifequal obj_content.class_name "ImageContent" %}
+					<div class="tile_block"><a href="/view?type=mcontent&gkey={{ obj_content.key }}"><img src="/thumb?thumb_id={{ obj_content.img_src.key }}" width="80px" height="80px" class="pc_img" border="0" /></a></div>
+					{% endifequal %}
+					{% ifequal obj_content.class_name "PicasaContent" %}
+					<div class="tile_block"><a href="/view?type=mcontent&gkey={{ obj_content.key }}"><img src="{{obj_content.thumb_medium}}" width="150px;" border="0" /></a></div>
+					{% endifequal %}
+					{% ifequal obj_content.class_name "FlickrContent" %}
+					<div class="tile_block"><a href="/view?type=mcontent&gkey={{ obj_content.key }}"><img src="http://farm4.static.flickr.com/{{obj_content.server}}/{{obj_content.photo_id}}_{{obj_content.secret}}_s.jpg" width="80px" height="80px" class="pc_img" border="0" /></a></div>
+					{% endifequal %}
+				{%endfor%}
+			</div>
+		</div>
+</div>
+</body>
+</html>	

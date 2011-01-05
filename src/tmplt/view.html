@@ -1,0 +1,94 @@
+<html>
+	<head>
+	<title> Grapes </title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link type="text/css" rel="stylesheet" href="http://l.yimg.com/g/css/c_fold_main.css.v85529.64777.80377.14">
+	<link href="http://l.yimg.com/g/css/c_sets.css.v74709.14" rel="stylesheet" type="text/css" />
+	<link href="http://l.yimg.com/g/css/c_bo_selecta.css.v80386.14" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+	img.primary_photo_img {
+  	max-width: 320px;
+  	max-height: 200px;
+  	width: expression(this.width > 320 ? "320px" : true);
+  	height: expression(this.height > 200 ? "200px" : true);
+	}
+	</style>
+	</script>
+	<script src="AC_OETags.js" language="javascript"></script>
+	</head>
+	<body>
+	<SCRIPT LANGUAGE="JavaScript">
+    function UpdateCurrentImage(key,title,content) {
+        window.document.title=title;
+        document.getElementById("primary_photo_img" ).setAttribute( 'src', 'img?img_id='+key);
+        document.getElementById("primary_photo_hlink" ).setAttribute( 'href', 'img?img_id='+key);
+        document.getElementById("grapeKey" ).setAttribute( 'value',key);
+        document.getElementById("description_div" ).innerHTML = title+"</br>"+content+"</br>";
+        return "successful";
+    }
+	</SCRIPT>
+	<SCRIPT LANGUAGE="JavaScript">
+	function getSWF(movieName) 
+	{
+      if (navigator.appName.indexOf("Microsoft") != -1) 
+      {
+        return window[movieName];
+      }
+      else 
+      {
+        return document[movieName];
+      }
+    }
+   
+    function callApp() 
+    {
+    	var gkey = document.getElementById("grapeKey").getAttribute( 'value');
+     	getSWF('uploadmod').FlexSubmit(gkey);
+    }
+    </SCRIPT>
+	<div>
+	</br>
+	</br>
+	</br>
+	</div>
+<div id="Main" class="">
+	{%	if thisGrain.pnode.key %}
+	<div>
+    <a href="/grapeview?gkey={{thisGrain.pnode.key}}"><img width="100" src='img?img_id={{thisGrain.pnode.key}}'></img></a>
+    </div>
+	{% endif %}
+	<div>
+	</br>
+	</div>
+<div id="ViewSet">
+	<div class="vsDetails">
+				<p class="vsThumbnail"><span class="photo_container pc_m"><a id="primary_photo_hlink" href="img?img_id={{thisGrain.key }}" title="{{thisGrain.title }}" class="image_link"><img id="primary_photo_img" src="img?img_id={{thisGrain.key }}" class="pc_img" border="0" /></a></span></p>
+				<p class="vsDescription" id="description_div">{{thisGrain.content}}</p>
+				<div>
+				</br>
+	</div>
+	<div>
+	<form action="/addgrain" enctype="multipart/form-data" method="post">
+                <div><textarea name="content" rows="3" cols="40"></textarea></div>
+                <div>Pics<input type="file" value="browse" name="img" rows="1" cols="10"></div>
+                <div>Tags<input type="text" name="tags" rows="1" cols="10"></div>
+                <input type="hidden" name="gkey" value="{{thisGrain.key}}">
+                <div><input type="submit" value="Add Grain"></div>
+    </form>
+	</div>
+	<div>
+	{% for grain in grains %}
+			<div>
+            <a href="/grapeview?gkey={{grain.key}}"><img width="100" src='img?img_id={{grain.key}}'></img></a>
+            </div>
+            </br>
+	{% endfor %}
+	</div>
+
+	</div>
+</div>
+</div><!--ViewSet-->
+</div><!--end Main-->
+
+</body>
+</html>

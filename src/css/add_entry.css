@@ -1,0 +1,133 @@
+	body{
+		font-family:"Helvetica","Verdana","Trebuchet MS" ,"Arial","sans-serif";
+		text-align:center;
+	}
+
+	.root_div
+	{
+		width: 800px;
+		margin-top:10px;
+		margin-bottom: auto;
+		margin-left: auto;
+		margin-right: auto;
+		text-align:left;
+	}
+	
+	a.thumb {text-decoration:none}
+	a:link {color : #8b8989}
+	a:visited {color : #8b8989}
+	
+	a.thumb{text-decoration : none}
+	a.thumb:link{color : #ffffff}
+	a.thumb:visited {color : #ffffff}
+	a.thumb:active {color : #ffffff}
+	
+	textarea { 
+		width: 80%;
+		height: 120px;
+		border: 3px solid #cccccc;
+		padding: 5px;
+	}
+	li { font-size: 11pt }
+	li p{ font-size: 14pt }
+	
+	div.instructions{
+		margin-top:10%;
+		width:100%;
+		display:block;
+		padding:5px;
+	}
+	
+	div.steps{
+		padding:20px;
+		text-align:left;
+		background: #eee;
+		display: block;
+		width:600px;
+	}
+	
+	.c_disabled{
+		color:#ddd;
+	
+	}
+	
+	.c_a_disabled{
+		color:#ddd;
+		text-decoration : none;
+	}
+	
+	#flickr_result{
+		overflow: auto;
+		width : 100%; 
+		height : 300px;
+	}
+	
+	#picasa_result{
+		overflow: auto;
+		width : 100%; 
+		height : 300px;
+	}
+	
+	#rss_result{
+		overflow: auto;
+		width : 100%; 
+		height : 300px;
+	
+	}
+	
+	div.thumb_tile{
+		float: left;
+	}
+	
+	div.tag_div {
+		height: 100px;
+		overflow:hidden;
+	}
+	
+	.tag_link{
+		float:left;
+		padding-left:10px;
+	}
+	
+	div.text_list{
+		float: left;
+		width: 200px;
+		height: 400px;	
+	}
+	
+	div.geo_tile{
+		float: left;
+		width: 200px;
+		height: 400px;
+	}
+	
+	div.text_block{
+	 	overflow:hidden;
+		text-align:left;
+		float:left;
+		height: 70px;
+		width:120px;
+		background: #FFF8DC;
+		padding:5px;
+	}
+	
+	div.tback_block{
+		text-align:left;
+		float:left;
+		height: 70px;
+		width:100px;
+		background: #C0C0C0;
+		padding:5px;
+	}
+	
+	div.tile_block{
+		display:block;
+		float:left;
+		padding-left:2px;
+	}
+	
+	#mylist_result{
+		overflow: auto;
+		width : 100%; 
+		height : 300px;
+	}

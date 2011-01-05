@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+	<meta charset="UTF-8" />
+	<title> Welcome to SF Photoclub </title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type='text/javascript' src='js/jquery.corner.js'></script>
+	<script src="http://connect.facebook.net/en_US/all.js"></script>
+	<link type='text/css' href='css/index_view.css' rel='stylesheet'/>
+	<link type='text/css' href='css/mbutton.css' rel='stylesheet'/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			// rotate images
+			/*
+			$('.tile_block').each(function(index) {
+				var rn = Math.floor(Math.random()*11);
+				var rt;
+				if(index%2)
+				{
+					rt = 'rotate(-'+rn.toString()+'deg)';
+				}
+				else
+				{
+					rt = 'rotate('+rn.toString()+'deg)';
+				}
+				$(this).first('a').css({'-webkit-transform':rt,'-moz-transform':rt});
+			});
+			*/
+		});
+	</script>
+	</head>
+<body>
+<div class="root_div_tile">
+	<div>
+		<div style="color:#fff;font-size:20pt;">
+			SF Photoclub
+		</div>
+		<div>
+			<a class='minibutton' href='/?mode=tile'><span >All</span></a>
+			<a class='minibutton' href='/'><span>Stream</span></a>
+			<a class='minibutton' href='info/faq.html'><span >?</span></a>
+			<a class='minibutton' href='http://psalty.tistory.com' ><span>B</span></a>
+			{% if current_fb_user %}
+				<a class='minibutton' href='/view?type=add.entry'><span>+</span></a>
+				<a class='minibutton' href='/view?type=profile' ><span>@</span></a>
+			{% endif %}
+			<fb:login-button autologoutlink="true"></fb:login-button>
+			<div id="fb-root"></div>
+			<script>
+			FB.init({appId: '{{facebook_app_id}}', status: true, cookie: true, xfbml: true});
+			FB.Event.subscribe('auth.sessionChange', function(response) {
+				if (response.session) {
+				// A user has logged in, and a new cookie has been saved
+					window.location.reload();
+				} else {
+				// The user has logged out, and the cookie has been cleared
+					window.location.reload();
+				}
+			});
+			</script>
+		</div>
+		<div style="clear:both;position: relative;width:800px;padding-top:10px;">
+			<div class="tag_div_tile">
+			{% for keyword in keywords %}
+				<span style="text-decoration:none;font-size:{{keyword.cnt|tag_weight}}pt"><a class="tag_cloud" href="/?keyword={{keyword.tag}}&mode=tile">{{keyword.tag}}</a></span>
+			{% endfor %}
+			</div>
+			<div class="thumb_tile">
+				{% for obj_content in obj_contents %}
+					{% ifequal obj_content.class_name "ImageContent" %}
+					<div class="tile_block _polaroid_frame"><a href="/view?type=mcontent&gkey={{ obj_content.key }}" title="{{obj_content.title|shortenTitle}}"><img src="/instax?instax_id={{ obj_content.img_src.key }}" border="0" /></a></div>
+					{% endifequal %}
+					{% ifequal obj_content.class_name "PicasaContent" %}
+					<div class="tile_block _polaroid_frame"><a href="/view?type=mcontent&gkey={{ obj_content.key }}" title="{{obj_content.title|shortenTitle}}"><img src="{{obj_content.thumb_medium}}" border="0" /></a></div>
+					{% endifequal %}
+					{% ifequal obj_content.class_name "FlickrContent" %}
+					<div class="tile_block _polaroid_frame"><a href="/view?type=mcontent&gkey={{ obj_content.key }}" title="{{obj_content.title|shortenTitle}}"><img src="http://farm4.static.flickr.com/{{obj_content.server}}/{{obj_content.photo_id}}_{{obj_content.secret}}_m.jpg" border="0" /></a></div>
+					{% endifequal %}
+				{%endfor%}
+			</div>
+		</div>
+	</div>
+
+</div>
+
+</body>
+</html>

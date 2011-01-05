@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+	<title>{{thisNode.title}}</title>
+	<meta name="title" content="title" />
+	<meta name="description" content="description "/>
+
+	<script language="JavaScript" src="js/fupload.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript" src="js/jquery.timers.js"></script>
+	<script type='text/javascript' src='js/jquery.corner.js'></script>
+	<script type='text/javascript' src='js/basic.js'></script>
+	<script type='text/javascript' src="js/jquery.editinplace.js"></script>
+	<script type='text/javascript' src="js/jstickynote/jquery.stickynote.js"></script>
+	<script type='text/javascript' src='js/jquery.corner.js'></script>
+	<script type="text/javascript" src="js/jstickynote/ui.core.js"></script>
+	<script type="text/javascript" src="js/jstickynote/ui.draggable.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="js/gmap.js"></script>
+	<script type="text/javascript" src="js/jhpapplystyle.js"></script>
+	<script type="text/javascript" src="js/jquery.ui.ipad.js"></script>
+	<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+	<script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"></script>
+	<script type="text/javascript" src="http://www.google.com/buzz/api/button.js"></script>
+	<link rel="stylesheet" type="text/css" href="js/jstickynote/css/style.css" media="screen"/>
+
+	<link type='text/css' href='css/demos.css' rel='stylesheet' media='screen' />
+
+	<!-- Contact Form CSS files -->
+	<link type='text/css' href='css/basic.css' rel='stylesheet' media='screen' />
+
+	<!-- IE 6 "fixes" -->
+	<!--[if lt IE 7]>
+	<link type='text/css' href='css/basic_ie.css' rel='stylesheet' media='screen' />
+	<![endif]-->
+	<link type='text/css' href='css/view.css' rel='stylesheet'/>
+	
+	<script type="text/javascript">
+
+		$(document).ready(function() {
+			jQuery('a.minibutton').bind({
+				mousedown: function() {
+					jQuery(this).addClass('mousedown');
+				},
+				blur: function() {
+					jQuery(this).removeClass('mousedown');
+				},
+				mouseup: function() {
+					jQuery(this).removeClass('mousedown');
+				}
+			});
+			
+			$.get('/getothernodes', 
+					{pkey: '{{thisNode.key}}'},
+					function(data) {
+						$('#children').html(data);
+						$('.child_item_div').each(
+							function( intIndex ){
+								/* detach from children place holder and move to decorative children div */
+								
+								if($(this).css('top')!='auto'  && $(this).css('left')!='auto')
+								{
+									applystyle_rotate_n_style(intIndex,$(this));
+									$(this).addClass('apsolute');
+								}
+							}
+						)
+				});
+
+			
+			setClickable('editInPlaceTitle');
+			
+		});
+
+		function setClickable(id_editable) 
+		{
+		
+			if(id_editable=="editInPlaceTitle")
+			{
+				$("#"+id_editable).editInPlace({
+					default_text: "(Click to add title)",
+					url: '/update_title',
+					params: 'gkey={{thisNode.key}}',
+					success: function(data){;}
+				});
+		
+			}
+			else if(id_editable=="editInPlaceTextBox")
+			{
+				$("#"+id_editable).editInPlace({
+					default_text: "(Click to add Description)",
+					field_type: "textarea",
+					textarea_rows: "20",
+					textarea_cols: "40", 
+					url: '/update_text',
+					params: 'gkey={{thisNode.key}}',
+					//show_buttons: true,
+					success: function(data){;}
+				});
+			
+			}
+			else
+			{
+				$("#"+id_editable).editInPlace({
+					default_text: "(Click to add Tags)",
+					url: '/update_tags',
+					params: 'gkey={{thisNode.key}}',
+					success: function(data){ ;}
+				});
+			}
+
+		}
+		
+		function deleteNode(key)
+		{
+			$.post("/delete_content",
+				{ pkey: '{{thisNode.key}}',
+				  gkey: key},
+				function(data){
+					location.replace("/");
+				});
+		}
+		function mapview_initialize()
+		{
+			if("{{thisNode.class_name}}" == "LocationContent")
+			{
+			var thisLatLang = new google.maps.LatLng({{thisNode.latlang}});
+			var myOptions = {
+				zoom: 15,
+				center: thisLatLang,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			};
+			var map_view = new google.maps.Map(document.getElementById("mapview_canvas"), myOptions);
+				var marker = new google.maps.Marker({
+						position: thisLatLang, 
+						map: map_view
+					});
+					
+				google.maps.event.addListener(marker, 'click', function(event) {
+				});
+			}
+		}
+		
+	</script>
+
+	</head>
+<body onload="mapview_initialize()">
+	<div class="root_div">
+		<div>
+			<a class='minibutton' href='/'><span >Home</span></a>
+			<a class='minibutton' href='/cvgrapemap?gkey={{thisNode.key}}' ><span>Show Map</span></a>
+			{% if userinfo %}
+				<a class='minibutton' href="{{loginout}}"><span>@Sign Out</span></a>
+				<a class='minibutton' href='/add_new_content'><span>New</a></span>
+				<a class='minibutton' href='/mycontentview' ><span>History</span></a>
+			{% else %}
+				<a class='minibutton' href="{{loginout}}"><span>@Sign In</span></a>
+			{% endif %}
+		</div>
+		<div id="help" class='help'></div>
+		<div style="clear:both;position: relative;">
+			<div style="display:block;position: relative;height:100px;">
+				<div style="position: absolute;right:10px;">
+					<div class="share_button"><a href="http://twitter.com/share" class="twitter-share-button" data-url="http://zapsori.appspot.com/contentview?gkey={{thisNode.key}}" data-count="vertical">Tweet</a></div>
+					<div class="share_button"><a name="fb_share" type="box_count" href="http://www.facebook.com/sharer.php" share_url="http://zapsori.appspot.com/contentview?gkey={{thisNode.key}}">Share</a></div>
+					<div class="share_button"><a title="Post to Google Buzz" class="google-buzz-button" href="http://www.google.com/buzz/post" data-url="http://zapsori.appspot.com/contentview?gkey={{thisNode.key}}" data-button-style="normal-count"></a></div>
+				</div>
+			</div>
+			<div class="primary_loc_content_div">
+				<div id="editInPlaceTitle" class="title_bar">
+					{% if thisNode.title %}
+						{{ thisNode.title }}
+					{% else %}
+						Untitled
+					{% endif %}
+				</div>
+				<div style="padding-top:20px;"></div>
+				<div class="gallery">
+					<div id="mapview_canvas" style="margin:auto; height:800px;"></div> 
+				</div>
+			</div>
+			<div class="children_div" id="trashcan">
+				<div id="children"></div>
+			</div>
+	</div>
+</body>
+</html>

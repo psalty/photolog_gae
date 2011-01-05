@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+	<title>{{thisNode.title}}</title>
+	<meta name="title" content="{{thisNode.title}}" />
+	<meta name="description" content="{{thisNode.content_text}}"/>
+	<meta name="key" content="{{thisNode.key}}"/>
+
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.timers.js"></script>
+	<script type='text/javascript' src='js/jquery.corner.js'></script>
+	<script type='text/javascript' src="js/jquery.editinplace.js"></script>
+	<script type='text/javascript' src='js/jquery.corner.js'></script>
+	<script type="text/javascript" src="js/jhp_style_lib.js"></script>
+	<script type="text/javascript" src="js/jquery.ui.ipad.js"></script>
+	<script type="text/javascript" src="js/jhp_flickr_lib.js"></script>
+	<script type="text/javascript" src="js/jhp_edit_in_place_lib.js"></script>
+	<script type="text/javascript" src="js/jhp_content_lib.js"></script>
+	<script type="text/javascript" src="js/jquery.tipsy.js"></script>	
+	<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+	<script src="http://connect.facebook.net/en_US/all.js"></script>
+	<script type="text/javascript" src="http://static.ak.fbcdn.net/connect.php/js/FB.Share"></script>
+	<script type="text/javascript" src="http://www.google.com/buzz/api/button.js"></script>
+	<link type='text/css' href='css/tipsy2.css' rel='stylesheet' />
+	<link type='text/css' href='css/view.css' rel='stylesheet'/>
+	<link type='text/css' href='css/mbutton.css' rel='stylesheet'/>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('div.text_box').corner();
+			$('#stitch').tipsy({gravity: 'e', fallback : 'stitch your image to what you see' });
+			$('#children').tipsy({gravity: 'e', fallback : 'stitched images' });
+			$('#forced_direct_map').tipsy({gravity: 'n', fallback : 'forced direct maps of stiched images' });
+			$('#show_all_by_this_id').tipsy({gravity: 'e', fallback : 'Show All contents by same user' });
+			$('#add_new').tipsy({gravity: 'n', fallback : 'Add new Image' });
+			$('#help').html("Help : Relate your idea to current Content");
+			jQuery('a.minibutton').bind({
+				mousedown: function() {
+					jQuery(this).addClass('mousedown');
+				},
+				blur: function() {
+					jQuery(this).removeClass('mousedown');
+				},
+				mouseup: function() {
+					jQuery(this).removeClass('mousedown');
+				}
+			});
+
+			get_children('{{thisNode.key}}');
+			{% ifequal current_fb_user.id thisNode.owner_id %}
+				setClickable('editInPlaceTitle');
+				setClickable('editInPlaceTextBox');
+				setClickable('editInPlaceTags');
+			{% endifequal %}
+		});
+		
+	</script>
+	</head>
+<body>
+	<div class="root_div">
+		<div id="header">
+			<div style="color:#000;font-size:20pt;">
+				SF Photoclub
+			</div>
+			<a class='minibutton' href='/'><span >Home</span></a>
+			<a id='forced_direct_map' class='minibutton' href='/map?method=view&type=cvmap' ><span>*</span></a>
+			<a id='add_new' class='minibutton' href='/view?type=add.entry'><span>+</span></a>
+			<fb:login-button autologoutlink="true"></fb:login-button>
+			<div id="fb-root"></div>
+			<script>
+			FB.init({appId: '{{facebook_app_id}}', status: true, cookie: true, xfbml: true});
+			FB.Event.subscribe('auth.sessionChange', function(response) {
+				if (response.session) {
+				// A user has logged in, and a new cookie has been saved
+				} else {
+				// The user has logged out, and the cookie has been cleared
+				}
+			});
+			</script>
+		</div> <!-- end of div.header -->
+		<div style="clear:both;position: relative;padding-top:50px">
+			<div class="primary_content_div">
+				<div style="display:table-row;">
+					<div class="gallery">
+					{% ifequal thisNode.class_name "ImageContent" %} 
+						<a href="img?img_id={{thisNode.img_src.key }}" target="_blank"><img class="primary_photo_img" src="img?img_id={{thisNode.img_src.key }}" alt=""/></a>
+					{% endifequal %}
+					{% ifequal thisNode.class_name "PicasaContent" %}
+						<a href="{{thisNode.photo_path}}" target="_blank">
+							<img class="primary_photo_img" src="{{thisNode.photo_path}}" alt=""/>
+						</a>
+					{% endifequal %}
+					{% ifequal thisNode.class_name "FlickrContent" %}
+						<a href="http://www.flickr.com/photos/{{thisNode.user_id}}/{{thisNode.photo_id}}" target="_blank">
+							<img class="primary_photo_img" src="http://static.flickr.com/{{thisNode.server}}/{{thisNode.photo_id}}_{{thisNode.secret}}.jpg" alt=""/>
+						</a>
+					{% endifequal %}
+					</div>
+					<div class="children_div">
+						<div id="children"></div>
+					</div>
+				</div>
+				{% ifequal thisNode.class_name "FlickrContent" %}
+				<div style="display:table-row;">
+					<div class="user_info">
+						<span> Author: {{thisNode.user_name}}</span>
+					</div>
+				</div>
+				{% endifequal %}
+				{% ifequal thisNode.class_name "PicasaContent" %}
+				<div style="display:table-row;">
+					<div class="user_info">
+						<span> Author: {{thisNode.credit}}</span>
+					</div>
+				</div>
+				{% endifequal %}
+				<div style="display:table-row;">
+					<div class="user_info">
+						<p><a href="/view?type=profile&email={{thisNode.fb_owner.id}}"><img id="show_all_by_this_id" width="30px;" style="border:none;" src="http://graph.facebook.com/{{ thisNode.owner_id }}/picture?type=square"/></a>
+						<span> Imported by {{thisNode.owner_name}} [{{thisNode.timestamp}}]</span></p>
+					</div>
+				</div>
+				<div style="display:table-row;">
+					<div class="tag_div">
+							{% if thisNode.tags %}
+								{% for tag in thisNode.tags %}
+								<div class="editInPlaceTags" style="float:left;padding-right:2px;">{{tag}}</div>
+								{%endfor%}
+							{% else %}
+								<div class="editInPlaceTags">notags</div>
+							{% endif %}
+					</div>
+					<div style="display:table-cell;"></div>
+				</div>
+				<div style="display:table-row;">
+					<div style="display:table-cell;padding-top:10px;">
+						<div style="display:table-cell;width:90%;">
+						{% if current_fb_user %}
+							<!--a id='stitch' class='minibutton' style="color:#b22222;" href='/view?type=add.entry&pkey={{thisNode.key}}'><span>Stitch</span></a-->
+							{% ifequal current_fb_user.id thisNode.owner_id %}
+							<a class='minibutton' href="javascript:deleteNode('{{thisNode.key}}')"><span >Delete</span></a>
+							{% endifequal %}
+						{% endif %}
+						</div>
+						<div class="share_button">
+							<a href="http://twitter.com/share" class="twitter-share-button" data-url="http://sfphotolog.appspot.com/view?type=mcontent&gkey={{thisNode.key}}" data-count="none">Tweet</a>
+						</div>
+						<div class="share_button" style="padding-left:5px;">
+							<a name="fb_share" type="button" href="http://www.facebook.com/sharer.php" share_url="http://sfphotolog.appspot.com/view?type=mcontent&gkey={{thisNode.key}}">Share</a>
+						</div>
+					</div>
+					<div style="display:table-cell;"></div>
+				</div>
+				<div style="display:table-row;">
+					<div class="title_bar" id="editInPlaceTitle" >
+						{% if thisNode.title %}
+							{{ thisNode.title }}
+						{% else %}
+							Untitled
+						{% endif %}
+					</div>
+					<div style="display:table-cell;"></div>
+				</div>
+				<div style="display:table-row;">
+					<div class="content_box" id="editInPlaceTextBox">
+						{% if thisNode.content_text %}
+							{{ thisNode.content_text }}
+						{% else %}
+							{% ifequal current_fb_user.id thisNode.owner_id %}
+								Add your Description
+							{%  endifequal %}
+						{% endif %}
+					</div>
+					<div style="display:table-cell;"></div>
+				</div>
+			</div>
+		</div>
+		<div style="display:table;">
+			<div style="display:table-row;">
+				<div style="display:table-cell;width:500px;vertical-align:top;">
+					<div id="disqus_thread"></div>
+				</div>
+				<div style="display:table-cell;padding-left:10px;vertical-align:top;margin:auto;">
+					<script type="text/javascript"><!--
+						google_ad_client = "{{google_ad_client}}";
+						/* 200x200, created 10/3/10 */
+						google_ad_slot = "{{google_ad_slot}}";
+						google_ad_width = 200;
+						google_ad_height = 200;
+						//-->
+					</script>
+					<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+  /**
+    * var disqus_identifier; [Optional but recommended: Define a unique identifier (e.g. post id or slug) for this thread] 
+    */
+	(function() {
+		var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+		dsq.src = 'http://sfphotolog.disqus.com/embed.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	})();
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript=sfphotolog">comments powered by Disqus.</a></noscript>
+	<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+	<script type="text/javascript">
+	var disqus_shortname = '{{desqus_id}}';
+	var disqus_developer = 1;
+	(function () {
+	var s = document.createElement('script'); s.async = true;
+	s.src = 'http://disqus.com/forums/{{desqus_id}}/count.js';
+	(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+	}());
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+{% for node in grapes %}
+<div>
+	<div class="child_item_div" id="{{node.to_node.key}}" style="display:none;">
+	{% ifequal node.to_node.class_name "ImageContent" %}
+		<div class="image">
+			<a href="/view?type=mcontent&gkey={{node.to_node.key}}" style="text-decoration : none;color:#ffffff;">
+				<img style="width:30px;" src="/thumb?thumb_id={{node.to_node.key}}" alt="" />
+			</a>
+		</div>
+	{% endifequal %}
+	{% ifequal node.to_node.class_name "FlickrContent" %}
+		<div class="image">
+			<a href="/view?type=mcontent&gkey={{ node.to_node.key }}" style="text-decoration : none;color:#ffffff;">
+				<img style="width:30px;" src="http://static.flickr.com/{{node.to_node.server}}/{{node.to_node.photo_id}}_{{node.to_node.secret}}_s.jpg" alt=""/>
+			</a>
+		</div>
+	{% endifequal %}
+	{% ifequal node.to_node.class_name "PicasaContent" %}
+		<div class="image">
+			<a href="/view?type=mcontent&gkey={{ node.to_node.key }}">
+				<img style="width:30px;" src="{{node.to_node.thumb_small}}"/>
+			</a>
+		</div>
+	{% endifequal %}
+	</div>
+</div>
+{% endfor %}

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<meta name="fbn" content="{{ current_fb_user.name|escape }}"/>
+	<meta name="key" content="{{ pnode.key }}"/>
+	<title> Import Image </title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.form.js"></script>
+	<script type="text/javascript" src="http://code.google.com/apis/gears/gears_init.js"></script>
+	<script type='text/javascript' src="js/swfobject.js"></script>
+	<script type='text/javascript' src='js/jquery.corner.js'></script>
+	<script type="text/javascript" src="js/jhp_flickr_lib.js"></script>
+	<script type='text/javascript' src="js/jquery.editinplace.js"></script>
+	<script type="text/javascript" src="js/jhp_edit_in_place_lib.js"></script>
+	<script type="text/javascript" src="js/jhp_add_lib.js"></script>
+	<script src="http://connect.facebook.net/en_US/all.js"></script>
+	<script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAA_F4ivFBdTZklPdqZJew2CRQbdaA6YntNbnLQRNgzLQ4ddCaL8BS5tdi3Bxr1Mfx1-DH0HMnYoS7rKg"></script>
+	<link type='text/css' href='css/add_entry.css' rel='stylesheet'/>
+	<link type='text/css' href='css/mbutton.css' rel='stylesheet'/>
+	
+	<script type="text/javascript">
+		google.load("feeds", "1");
+		$(document).ready(function() {
+			$('div.steps').corner();
+			move_to_step_1();
+			
+			$('a.menu').click(function () {
+				$('.detail_menu').hide();
+				var newId = '#'+$(this).attr('id')+'-detail';
+				move_to_step_2();
+				$(newId).slideDown("fast");
+				if(newId == '#upload-webcam-detail')
+				{
+					swfobject.embedSWF("swfs/uploadmod.swf", "myflash", "480", "398", "10.0.45.2", "swfs/expressInstall.swf",{}, {}, {id:"uploadmod",name:"uploadmod"});
+				}
+				else if(newId == '#upload-relationship-detail')
+				{
+					browseMyHistory('{{ pnode.key}}');
+				
+				}
+				return false;
+			});
+
+			var options = { 
+				success:	showResponse,		// post-submit callback 
+				clearForm:	true,				// clear all form fields after successful submit 
+				// $.ajax options can be used here too, for example: 
+				timeout:   3000 
+			}; 
+			
+			$('#imageform').ajaxForm(options);
+			
+		});
+
+		// post-submit callback 
+		function showResponse(data)
+		{ 
+			// following line is a hack due to the limitation of current Jquery.form plug in error
+			var data = $.parseJSON($(data).text());
+			$('#move_to_btn').attr('href','javascript:moveToView("'+data.newkey+'")');
+			move_to_step_3(data.newkey);
+		}
+
+
+		function move_to_step_1()
+		{
+			$('#step2').toggleClass('c_disabled');
+			$('#step3').toggleClass('c_disabled');
+			$('#step3 > div').hide();
+			$('#step4').toggleClass('c_disabled');
+			$('#step4 > div').hide();
+			$('.detail_menu').hide();
+		
+		}
+
+		function move_to_step_2()
+		{
+			$('#step1').toggleClass('c_disabled');
+			$('#step2').toggleClass('c_disabled');
+		}
+
+		function move_to_step_3(key)
+		{
+			$('#step1').hide();
+			$('#step2').toggleClass('c_disabled');
+			$('.detail_menu').hide();
+			$('#step2').hide();
+			$('#step3').toggleClass('c_disabled');
+			$('#step3 > div').fadeIn('slow');
+			{% if pnode %}
+				var script_path = "javascript:connectTo('{{ pnode.key }}','"+key+"');";
+				var button = $(document.createElement('a')).addClass('minibutton').attr('href',script_path);
+				var butttl = $(document.createElement('span')).text("Stitch to below content");
+				button.append(butttl);
+				$('#connect_button_div').append(button);
+			{% endif %}
+		}
+		
+		function startOver()
+		{
+			if($('#gkey').val())
+				location.replace('/view?type=add.entry?pkey='+$('#gkey').val());
+			else
+				location.replace('/view?type=add.entry');
+		}
+
+		function moveToView(gkey)
+		{
+			if(gkey)
+			{
+				location.replace('/view?type=mcontent&gkey='+gkey);
+			}
+			else
+			{
+				if($('#gkey').val())
+				{
+					location.replace('/view?type=mcontent&gkey='+$('#gkey').val());
+				}
+			}
+		}
+
+		function updateCompleted(newkey) 
+		{
+			$('#move_to_btn').attr('href','javascript:moveToView("'+newkey+'")');
+			move_to_step_3(newkey);
+		}
+		
+		function updateCompletedEx(key,src) 
+		{
+			var key_str = "<input id='gkey' type='hidden' value='"+key+"'/>";
+			$('#output_preview').html(key_str);
+			move_to_step_4();
+		}
+
+		function addGeoInfo()
+		{
+			$.post("/add_map_content", 
+				{ geotag: marker.getPosition().toUrlValue() , ipaddr:"{{ip_addr}}" },
+			function(data){
+				updateCompleted(data);
+			});
+		}
+		
+
+	</script>
+</head>
+<body>
+<div class="root_div">
+	<div>
+		<div style="color:#000;font-size:20pt;">
+			SF Photoclub
+		</div>
+		<a class='minibutton' href='/'><span >Home</span></a>
+		<fb:login-button autologoutlink="true"></fb:login-button>
+		<div id="fb-root"></div>
+		<script>
+			FB.init({appId: '{{facebook_app_id}}', status: true, cookie: true, xfbml: true});
+			FB.Event.subscribe('auth.sessionChange', function(response) {
+				if (response.session) {
+				// A user has logged in, and a new cookie has been saved
+				} else {
+				// The user has logged out, and the cookie has been cleared
+				}
+			});
+		</script>
+	</div>
+	<div class="instructions" align="center"> 
+		<div class="steps"> 
+			<ul>
+			<li id="step1"> 
+				<p>Step 1: Choose type of media</p>
+				<div class="enabled">Choose type of content you want to create/add
+					<ul>
+						{% if pnode.key %}
+						<li><a id="upload-relationship" class="menu" href="#"> Content from your previous upload</a></li>
+						{% endif %}
+						<li><a id="upload-image" class="menu" href="#"> Upload from your HDD</a></li>
+						<li><a id="upload-webcam" class="menu" href="#"> Take a Snapshot</a></li>
+						<li><a id="upload-flickr" class="menu" href="#"> Import Flickr Image</a></li>
+						<li><a id="upload-picasa" class="menu" href="#"> Import Picasa Image</a></li>
+						<!--li><a id="upload-blog" class="menu" href="#"> Import Blog Image</a></li-->
+					</ul>
+				</div>
+			</li>
+			<li id="step2">
+				<p>Step 2: Upload,Capture or Connect</p>
+				{% if pnode.key %}
+				<div id="upload-relationship-detail" class="detail_menu"><div id="mylist_result" ></div></div>
+				{% endif %}
+				<div id="upload-image-detail" class="detail_menu" >
+					<form id="imageform" action="/create" enctype="multipart/form-data" method="post">
+						<input style="padding-left:20px;" type="file" name="pics" rows="1">
+						<input type="hidden" name="target" value="image">
+						<input type="hidden" name="ipaddr" value="{{ip_addr}}">
+						<input style="width:100px;" type="submit">
+					</form>
+				</div>
+				<div id="upload-webcam-detail" class="detail_menu" >
+					<form id="webcamform" onsubmit="return false;">
+						<div id="myflash" style="padding-top:10px;">
+							<h1>Alternative content</h1>
+							<p><a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a></p>
+						</div>
+						<div style="padding-top:10px;"><input style="width:100px;" type="submit" onClick="uploadWebCam('{{ip_addr}}')"></div>
+					</form>
+				</div>
+				<div id="upload-flickr-detail" class="detail_menu" >
+					<a class='minibutton' href="javascript:browseFlickr();"><span>Browse</span></a>
+					ID <input type="text" id="flickr_id">
+					<div style="padding-top:20px;"></div>
+					<div class="display:none;" id="flickr_result" ></div>
+				</div>
+				<div id="upload-picasa-detail" class="detail_menu" >
+					<a class='minibutton' href="javascript:browsePicasa();"><span>Browse</span></a>
+					ID <input type="text" id="picasa_id">
+					<div style="padding-top:20px;"></div>
+					<div class="display:none;" id="picasa_result" ></div>
+				</div>
+				<div id="upload-blog-detail" class="detail_menu" >
+					<a class='minibutton' href="javascript:browseRssFeed();"><span>Browse</span></a>
+					RSS <input type="text" id="rss_url" width="200px;">
+					<div style="padding-top:20px;"></div>
+					<div class="display:none;" id="rss_result" >
+					<ul id="rss_result_list"></ul>
+					</div>
+				</div>
+			</li> 
+			<li id="step3">
+				<p>Step 3: Etc.. </p>
+				<div id='connect_button_div'></div>
+				{% if pnode %}
+				<div style="display:block;padding-top:10px;">
+					<input id="pkey" type="hidden" value="{{pnode.key}}"/>
+					{% ifequal pnode.class_name "ImageContent" %}<img class="instax_child_img" src="/instax?instax_id={{pnode.img_src.key}}"/>{% endifequal %}
+					{% ifequal pnode.class_name "FlickrContent" %}<img class="instax_child_img" src="http://farm4.static.flickr.com/{{pnode.server}}/{{pnode.photo_id}}_{{pnode.secret}}_m.jpg"/>{% endifequal %}
+					{% ifequal pnode.class_name "PicasaContent" %}<img class="instax_child_img" src="{{pnode.thumb_medium}}"/>{% endifequal %}
+				</div>
+				{% endif %}
+				<div><a class='minibutton' href="javascript:startOver();"><span>Add Another Content</span></a> or <a id="move_to_btn" class='minibutton' href="javascript:moveToView('');"><span>Completed</span></a></div>
+			</li>
+		</ul>
+		</div>
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{% if node %}
+	<div class="child_item_div" id="{{node.key}}" style="display:block;">
+	{% ifequal node.class_name "TrackbackContent" %}
+		<div class="rotate trackback" style="width:80px;">
+			<a href="/photolog_content_view?gkey={{node.key}}">
+				<div>
+					<div class='jStickyNote' style="cursor:move;">
+						<span style="float:left;overflow:hidden;width:60%;margin:15px 15px 15px 24px;">{{ node.blog_name }},{{ node.title }}</span>
+					</div>
+				</div>
+			</a>
+		</div>
+	{% endifequal %}
+	{% ifequal node.class_name "ImageContent" %}
+		<div class="rotate image">
+			<a href="/photolog_content_view?gkey={{node.key}}" style="text-decoration : none;color:#ffffff;">
+				<img src="/instax?instax_id={{node.img_src.key}}" alt="" />
+			</a>
+		</div>
+	{% endifequal %}
+	</div>
+{% endif %}

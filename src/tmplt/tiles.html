@@ -1,0 +1,31 @@
+<div class="thumb_tile">
+		{% for obj_content in obj_contents %}
+			{% ifequal obj_content.class_name "ImageContent" %}
+			<div class="tile_block"><a href="/view?mcontent&gkey={{ obj_content.key }}"><img src="/instax?instax_id={{ obj_content.key }}" class="pc_img" border="0" /></a></div>
+			{% endifequal %}
+			{% ifequal obj_content.class_name "PicasaContent" %}
+			<div class="tile_block"><a href="/view?mcontent&gkey={{ obj_content.key }}"><img src="{{obj_content.thumb_medium}}" border="0"/></a></div>
+			{% endifequal %}
+			{% ifequal obj_content.class_name "FlickrContent" %}
+			<div class="tile_block"><a href="/view?mcontent&gkey={{ obj_content.key }}"><img src="http://farm4.static.flickr.com/{{obj_content.server}}/{{obj_content.photo_id}}_{{obj_content.secret}}_m.jpg"  class="pc_img" border="0" /></a></div>
+			{% endifequal %}
+		{%endfor%}
+</div>
+
+            if obj.class_name() =="ImageContent":
+                cml = doc.createElement("content")
+                cml.setAttribute("type", obj.class_name())
+                cml.setAttribute("key", str(obj.key()))
+                root.appendChild(cml)
+
+                title_xml = doc.createElement("title")
+                ptext = doc.createTextNode(str(obj.title))
+                title_xml.appendChild(ptext)
+                cml.appendChild(title_xml)
+
+                owner_xml = doc.createElement("user")
+                otext = doc.createTextNode(obj.owner_name)
+                owner_xml.appendChild(otext)
+                cml.appendChild(owner_xml)
+                self.response.out.write(doc.toxml())
+            else:

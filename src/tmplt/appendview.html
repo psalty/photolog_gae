@@ -1,0 +1,52 @@
+<div>
+{% for obj_content in obj_contents %}
+	{% ifequal obj_content.class_name "ImageContent" %}
+	<div class="gallery">
+		<a href="/view?type=mcontent&gkey={{ obj_content.key }}"><img class="primary_photo_img" src="/img?img_id={{ obj_content.img_src.key }}" border="0" /></a>
+		<div style="display:none;">
+		{% if obj_content.title %}
+			<div style="display:block;">{{obj_content.title}}</div>
+		{% else %}
+			<div style="display:block;">Untitled</div>
+		{% endif %}
+			<div style="display:block;padding-top:10px;font-size: 8pt;"><i>{{obj_content.owner_name}}</i></div>
+		{% if obj_content.content_text %}
+			<div style="display:block;padding-top:10px;font-size: 8pt;">{{obj_content.content_text|shortenText}}</div>
+		{% endif %}
+		</div>
+	</div>
+	{% endifequal %}
+	{% ifequal obj_content.class_name "FlickrContent" %}
+	<div class="gallery">
+		<a href="/view?type=mcontent&gkey={{ obj_content.key }}"><img class="primary_photo_img" src="http://farm4.static.flickr.com/{{obj_content.server}}/{{obj_content.photo_id}}_{{obj_content.secret}}_z.jpg" border="0"/></a>
+		<div style="display:none;">
+		{% if obj_content.title %}
+			<div style="display:block;">{{obj_content.title}}</div>
+		{% else %}
+			<div style="display:block;">Untitled</div>
+		{% endif %}
+			<div style="display:block;padding-top:10px;font-size: 5pt;"><i>{{ obj_content.owner_name }}</i></div>
+		{% if obj_content.content_text %}
+			<div style="display:block;padding-top:10px;font-size: 8pt;">{{obj_content.content_text|shortenText}}</div>
+		{% endif %}
+		</div>
+	</div>
+	{% endifequal %}
+	{% ifequal obj_content.class_name "PicasaContent" %}
+	<div class="gallery">
+		<a href="/view?type=mcontent&gkey={{ obj_content.key }}"><img class="primary_photo_img" src="{{obj_content.photo_path}}" border="0"/></a>
+		<div style="display:none;">
+		{% if obj_content.title %}
+			<div style="display:block;">{{obj_content.title}}</div>
+		{% else %}
+			<div style="display:block;">Untitled</div>
+		{% endif %}
+			<div style="display:block;padding-top:10px;font-size: 5pt;"><i>{{obj_content.owner_name}}</i></div>
+		{% if obj_content.content_text %}
+			<div style="display:block;padding-top:10px;font-size: 8pt;">{{obj_content.content_text|shortenText}}</div>
+		{% endif %}
+		</div>
+	</div>
+	{% endifequal %}
+{%endfor%}
+</div>

@@ -1,0 +1,8 @@
+<div>
+	{% ifequal thisNode.class_name "ImageContent" %} 
+		<img src="thumb?thumb_id={{thisNode.key }}" width="30px"/>
+	{% endifequal %}
+	{% ifequal thisNode.class_name "FlickrContent" %}
+		<img class="primary_photo_img" src="http://static.flickr.com/{{thisNode.server}}/{{thisNode.photo_id}}_{{thisNode.secret}}_s.jpg" width="30px"/>
+	{% endifequal %}
+</div>
