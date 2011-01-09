@@ -114,7 +114,7 @@ def photolog_content_view(handler):
             'facebook_app_id' : config.FACEBOOK_APP_ID,
             'google_ad_client' : config.GOOGLE_AD_CLIENT,
             'google_ad_slot' : config.GOOGLE_AD_SLOT,
-            'desqus_id' : config.DESQUS_ID,
+            'disqus_id' : config.DISQUS_ID,
             'thisNode' : thisNode,
             'tagstr' : out_str,
             'rnodes' : rnodes,
@@ -339,19 +339,34 @@ class RunApi(webapp.RequestHandler):
     def get(self):
         method = self.request.get('method')
         logging.debug(method)
-        doc = Document()
-        root = doc.createElement("channel")
-        doc.appendChild(root)
+        
         if method == "photo.list.all":
+            doc = Document()
+            root = doc.createElement("channel")
+            doc.appendChild(root)
+
             obj_contents = photolog_list_all('',5)
             for obj in obj_contents:
                 dom = parseString(obj.to_xml().encode('utf-8'))
                 root.appendChild(dom.getElementsByTagName("entity")[0])
         elif method == "user.info":
+            doc = Document()
+            root = doc.createElement("channel")
+            doc.appendChild(root)
+
             key = method = self.request.get('key')
             userinfo = get_user_by_key(key)
             dom = parseString(userinfo.to_xml().encode('utf-8'))
             root.appendChild(dom.getElementsByTagName("entity")[0])
+        elif method == "photo.one":
+            gkey = self.request.get('gkey')
+            if gkey:
+                obj = photolog_get_node(gkey)
+                doc = obj.get_info_in_xml()
+                #dom = parseString(obj.to_xml().encode('utf-8'))
+                #root.appendChild(dom.getElementsByTagName("entity")[0])
+            else:
+                return
             
         self.response.out.write(doc.toxml())
         

@@ -4,7 +4,7 @@ Created on May 19, 2010
 @author: jaehong park
 @email : psalty@gmail.com
 '''
-import logging,math
+import logging,math,os
 from google.appengine.ext import db
 from jhpdb.Content import Content
 from jhpdb.Tags import update_tagcounter
@@ -14,6 +14,8 @@ from google.appengine.ext import webapp
 from flickr import Photo
 from ImageBlob import ImageBlob
 from ImageBlob import create_image_blob
+from xml.dom.minidom import Document
+
 #image class
 class ImageContent(Content):
     img_src = db.ReferenceProperty(ImageBlob)
@@ -37,6 +39,47 @@ class ImageContent(Content):
     def add_tag(self,tag):
         self.tags.append(db.Category(tag))
         self.put()
+        
+    def get_info_in_xml(self):
+        if os.environ.get('HTTP_HOST'): 
+            host = os.environ['HTTP_HOST']
+        else: 
+            host = os.environ['SERVER_NAME']
+
+        doc = Document()
+        root = doc.createElement("channel")
+        doc.appendChild(root)
+
+        fb_id = doc.createElement("fb_id")
+        fb_id_val = doc.createTextNode(self.fb_owner.id)
+        fb_id.appendChild(fb_id_val)
+
+        if self.title != None:
+            ttl = doc.createElement("title")
+            ttl_val = doc.createTextNode(self.title)
+            ttl.appendChild(ttl_val)
+            root.appendChild(ttl)
+
+        thumb_nail = doc.createElement("small")
+        thumb_nail_val = doc.createTextNode("http://%s/thumb?thumb_id=%s"%(host,self.img_src.key()))
+        thumb_nail.appendChild(thumb_nail_val)
+        
+        med = doc.createElement("medium")
+        med_val = doc.createTextNode("http://%s/instax?instax_id=%s"%(host,self.img_src.key()))
+        med.appendChild(med_val)
+        
+        orimg = doc.createElement("big")
+        orimg_val = doc.createTextNode("http://%s/img?img_id=%s"%(host,self.img_src.key()))
+        orimg.appendChild(orimg_val)
+        
+        root.appendChild(fb_id)
+
+        root.appendChild(thumb_nail)
+        root.appendChild(med)
+        root.appendChild(orimg)
+        
+        return doc
+        
         
 class FlickrContent(Content):
     user_id = db.StringProperty()
@@ -70,6 +113,46 @@ class FlickrContent(Content):
         self.tags.append(db.Category(tag))
         self.put()
 
+    def get_info_in_xml(self):
+        if os.environ.get('HTTP_HOST'): 
+            host = os.environ['HTTP_HOST']
+        else: 
+            host = os.environ['SERVER_NAME']
+
+        doc = Document()
+        root = doc.createElement("channel")
+        doc.appendChild(root)
+
+        fb_id = doc.createElement("fb_id")
+        fb_id_val = doc.createTextNode(self.fb_owner.id)
+        fb_id.appendChild(fb_id_val)
+
+        if self.title != None:
+            ttl = doc.createElement("title")
+            ttl_val = doc.createTextNode(self.title)
+            ttl.appendChild(ttl_val)
+            root.appendChild(ttl)
+
+        thumb_nail = doc.createElement("small")
+        thumb_nail_val = doc.createTextNode("http://farm4.static.flickr.com/%s/%s_%s_s.jpg"%(self.server,self.photo_id,self.secret))
+        thumb_nail.appendChild(thumb_nail_val)
+        
+        med = doc.createElement("medium")
+        med_val = doc.createTextNode("http://farm4.static.flickr.com/%s/%s_%s_m.jpg"%(self.server,self.photo_id,self.secret))
+        med.appendChild(med_val)
+        
+        orimg = doc.createElement("big")
+        orimg_val = doc.createTextNode("http://static.flickr.com/%s/%s_%s.jpg"%(self.server,self.photo_id,self.secret))
+        orimg.appendChild(orimg_val)
+        
+        root.appendChild(fb_id)
+
+        root.appendChild(thumb_nail)
+        root.appendChild(med)
+        root.appendChild(orimg)
+        
+        return doc
+
 class PicasaContent(Content):
     photo_path = db.LinkProperty()
     thumb_small = db.LinkProperty()
@@ -91,6 +174,46 @@ class PicasaContent(Content):
     def add_tag(self,tag):
         self.tags.append(db.Category(tag))
         self.put()
+
+    def get_info_in_xml(self):
+        if os.environ.get('HTTP_HOST'): 
+            host = os.environ['HTTP_HOST']
+        else: 
+            host = os.environ['SERVER_NAME']
+
+        doc = Document()
+        root = doc.createElement("channel")
+        doc.appendChild(root)
+
+        fb_id = doc.createElement("fb_id")
+        fb_id_val = doc.createTextNode(self.fb_owner.id)
+        fb_id.appendChild(fb_id_val)
+
+        if self.title != None:
+            ttl = doc.createElement("title")
+            ttl_val = doc.createTextNode(self.title)
+            ttl.appendChild(ttl_val)
+            root.appendChild(ttl)
+
+        thumb_nail = doc.createElement("small")
+        thumb_nail_val = doc.createTextNode(self.thumb_small)
+        thumb_nail.appendChild(thumb_nail_val)
+        
+        med = doc.createElement("medium")
+        med_val = doc.createTextNode(self.thumb_medium)
+        med.appendChild(med_val)
+        
+        orimg = doc.createElement("big")
+        orimg_val = doc.createTextNode(self.thumb_large)
+        orimg.appendChild(orimg_val)
+        
+        root.appendChild(fb_id)
+
+        root.appendChild(thumb_nail)
+        root.appendChild(med)
+        root.appendChild(orimg)
+        
+        return doc
 
 class Thumb(webapp.RequestHandler):
     def get(self):

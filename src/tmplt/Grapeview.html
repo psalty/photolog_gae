@@ -56,6 +56,18 @@
 			{% endifequal %}
 		});
 		
+		function post_to_gp()
+		{
+			$.post("http://photologhub.appspot.com/post_to_gp", 
+				{ 
+					appname : '{{disqus_id}}',
+					gkey  : '{{thisNode.key}}'
+				},
+				
+				function(data){
+					//alert("completed");
+				});
+		}
 	</script>
 	</head>
 <body>
@@ -139,6 +151,7 @@
 						<div style="display:table-cell;width:90%;">
 						{% if current_fb_user %}
 							<!--a id='stitch' class='minibutton' style="color:#b22222;" href='/view?type=add.entry&pkey={{thisNode.key}}'><span>Stitch</span></a-->
+							<a id='stitch' class='minibutton' style="color:#b22222;" href="javascript:post_to_gp();"><span>Post</span></a>
 							{% ifequal current_fb_user.id thisNode.owner_id %}
 							<a class='minibutton' href="javascript:deleteNode('{{thisNode.key}}')"><span >Delete</span></a>
 							{% endifequal %}
@@ -201,6 +214,11 @@
   /**
     * var disqus_identifier; [Optional but recommended: Define a unique identifier (e.g. post id or slug) for this thread] 
     */
+	var disqus_shortname = '{{disqus_id}}';
+	var disqus_developer = 1;
+	var disqus_identifer = '{{disqus_id}}_{{thisNode.key}}';
+	var disqus_url = 'http://sfphotolog.appspot.com/view?type=mcontent&gkey={{thisNode.key}}';
+
 	(function() {
 		var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
 		dsq.src = 'http://sfphotolog.disqus.com/embed.js';
@@ -211,8 +229,6 @@
 	<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
 
 	<script type="text/javascript">
-	var disqus_shortname = '{{desqus_id}}';
-	var disqus_developer = 1;
 	(function () {
 	var s = document.createElement('script'); s.async = true;
 	s.src = 'http://disqus.com/forums/{{desqus_id}}/count.js';
